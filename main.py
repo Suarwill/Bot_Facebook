@@ -9,8 +9,25 @@ libSetup('tkinter')
 from tkinter import *
 from tkinter import messagebox
 
-def start():
-    print("iniciamos bien")
+def ventanaPublicar():
+    # Crear nueva ventana
+    ventanaPublicar = Toplevel(ventana)
+    ventanaPublicar.title("Dar Like")
+
+    # Geometria
+    width, heigth = 200, 150
+    puntoMedioAnchura , puntoMedioAlto = int((ventanaPublicar.winfo_screenwidth()-width)/4), int((ventanaPublicar.winfo_screenheight()-heigth)/4)
+    ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+
+    # Recuadro para texto
+    texto_label = Label(ventanaPublicar, text="Texto:")
+    texto_label.grid(row=0, column=0)
+    texto_entry = Entry(ventanaPublicar)
+    texto_entry.grid(row=0, column=1)
+
+    # Botón "Empezar"
+    empezar_button = Button(ventanaPublicar, text="Empezar", command=lambda: likear(texto_entry.get()))
+    empezar_button.grid(row=1, column=0, columnspan=2)
 
 def ventanaLikear():
     # Crear nueva ventana
@@ -27,6 +44,35 @@ def ventanaLikear():
     empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
     empezar_button.grid(row=1, column=0, columnspan=2)
 
+def ventanaComentar():
+    # Crear nueva ventana
+    nueva_ventana = Toplevel(ventana)
+    nueva_ventana.title("Dar Like")
+
+    # Recuadro para texto
+    texto_label = Label(nueva_ventana, text="Texto:")
+    texto_label.grid(row=0, column=0)
+    texto_entry = Entry(nueva_ventana)
+    texto_entry.grid(row=0, column=1)
+
+    # Botón "Empezar"
+    empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
+    empezar_button.grid(row=1, column=0, columnspan=2)
+
+def ventanaCompartir():
+    # Crear nueva ventana
+    nueva_ventana = Toplevel(ventana)
+    nueva_ventana.title("Dar Like")
+
+    # Recuadro para texto
+    texto_label = Label(nueva_ventana, text="Texto:")
+    texto_label.grid(row=0, column=0)
+    texto_entry = Entry(nueva_ventana)
+    texto_entry.grid(row=0, column=1)
+
+    # Botón "Empezar"
+    empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
+    empezar_button.grid(row=1, column=0, columnspan=2)
 
 def likear(texto):
     print(f"Texto ingresado: {texto}")
@@ -65,14 +111,14 @@ separador_0 = Label(ventana, text=" ").grid(row=0, column=colcentral)
 separador_2 = Label(ventana, text=" ").grid(row=2, column=colcentral)
 
 #Botones
-botonPublicar = Button(ventana, text="Publicar", command=start)
+botonPublicar = Button(ventana, text="Publicar", command=ventanaPublicar)
 botonPublicar.grid(row=1, column=1, sticky="news")
-botonComentar = Button(ventana, text="Comentar", command=start)
+botonComentar = Button(ventana, text="Comentar", command=ventanaComentar)
 botonComentar.grid(row=3, column=1, sticky="news")
 
-botonLikear = Button(ventana, text="Dar Like", command=start)
+botonLikear = Button(ventana, text="Dar Like", command=ventanaLikear)
 botonLikear.grid(row=1, column=3, sticky="news")
-botonCompartir = Button(ventana, text="Compartir", command=start)
+botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir)
 botonCompartir.grid(row=3, column=3, sticky="news")
 
 # Expandir columnas hasta el borde (laterales)
