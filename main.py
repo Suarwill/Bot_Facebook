@@ -10,7 +10,6 @@ from tkinter import *
 from tkinter import messagebox
 
 def ventanaPublicar():
-    # Crear nueva ventana
     ventanaPublicar = Toplevel(ventana)
     ventanaPublicar.title("Dar Like")
 
@@ -30,18 +29,22 @@ def ventanaPublicar():
     empezar_button.grid(row=1, column=0, columnspan=2)
 
 def ventanaLikear():
-    # Crear nueva ventana
-    nueva_ventana = Toplevel(ventana)
-    nueva_ventana.title("Dar Like")
+    ventanaLikear = Toplevel(ventana)
+    ventanaLikear.title("Dar Like")
+
+    # Geometria
+    width, heigth = 200, 150
+    puntoMedioAnchura , puntoMedioAlto = int((ventanaLikear.winfo_screenwidth()-width)/4), int((ventanaLikear.winfo_screenheight()-heigth)/4)
+    ventanaLikear.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
     # Recuadro para texto
-    texto_label = Label(nueva_ventana, text="Texto:")
+    texto_label = Label(ventanaLikear, text="Texto:")
     texto_label.grid(row=0, column=0)
-    texto_entry = Entry(nueva_ventana)
+    texto_entry = Entry(ventanaLikear)
     texto_entry.grid(row=0, column=1)
 
     # Botón "Empezar"
-    empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
+    empezar_button = Button(ventanaLikear, text="Empezar", command=lambda: likear(texto_entry.get()))
     empezar_button.grid(row=1, column=0, columnspan=2)
 
 def ventanaComentar():
