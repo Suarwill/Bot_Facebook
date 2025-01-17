@@ -1,135 +1,69 @@
 import importlib as ilib
 import subprocess as sub
+
 def libSetup(lib):
-    # Funcion para instalar automaticamente librerias no existentes
-    try:ilib.import_module(lib)
-    except ImportError:sub.check_call(['pip', 'install', lib])
+    try:
+        ilib.import_module(lib)
+    except ImportError:
+        sub.check_call(['pip', 'install', lib])
 
 libSetup('tkinter')
 from tkinter import *
 from tkinter import messagebox
 
-def ventanaPublicar():
-    ventanaPublicar = Toplevel(ventana)
-    ventanaPublicar.title("Dar Like")
-
-    # Geometria
-    width, heigth = 200, 150
-    puntoMedioAnchura , puntoMedioAlto = int((ventanaPublicar.winfo_screenwidth()-width)/4), int((ventanaPublicar.winfo_screenheight()-heigth)/4)
-    ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
-
-    # Recuadro para texto
-    texto_label = Label(ventanaPublicar, text="Texto:")
-    texto_label.grid(row=0, column=0)
-    texto_entry = Entry(ventanaPublicar)
-    texto_entry.grid(row=0, column=1)
-
-    # Botón "Empezar"
-    empezar_button = Button(ventanaPublicar, text="Empezar", command=lambda: likear(texto_entry.get()))
-    empezar_button.grid(row=1, column=0, columnspan=2)
-
-def ventanaLikear():
-    ventanaLikear = Toplevel(ventana)
-    ventanaLikear.title("Dar Like")
-
-    # Geometria
-    width, heigth = 200, 150
-    puntoMedioAnchura , puntoMedioAlto = int((ventanaLikear.winfo_screenwidth()-width)/4), int((ventanaLikear.winfo_screenheight()-heigth)/4)
-    ventanaLikear.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
-
-    # Recuadro para texto
-    texto_label = Label(ventanaLikear, text="Texto:")
-    texto_label.grid(row=0, column=0)
-    texto_entry = Entry(ventanaLikear)
-    texto_entry.grid(row=0, column=1)
-
-    # Botón "Empezar"
-    empezar_button = Button(ventanaLikear, text="Empezar", command=lambda: likear(texto_entry.get()))
-    empezar_button.grid(row=1, column=0, columnspan=2)
-
-def ventanaComentar():
-    # Crear nueva ventana
-    nueva_ventana = Toplevel(ventana)
-    nueva_ventana.title("Dar Like")
-
-    # Recuadro para texto
-    texto_label = Label(nueva_ventana, text="Texto:")
-    texto_label.grid(row=0, column=0)
-    texto_entry = Entry(nueva_ventana)
-    texto_entry.grid(row=0, column=1)
-
-    # Botón "Empezar"
-    empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
-    empezar_button.grid(row=1, column=0, columnspan=2)
-
-def ventanaCompartir():
-    # Crear nueva ventana
-    nueva_ventana = Toplevel(ventana)
-    nueva_ventana.title("Dar Like")
-
-    # Recuadro para texto
-    texto_label = Label(nueva_ventana, text="Texto:")
-    texto_label.grid(row=0, column=0)
-    texto_entry = Entry(nueva_ventana)
-    texto_entry.grid(row=0, column=1)
-
-    # Botón "Empezar"
-    empezar_button = Button(nueva_ventana, text="Empezar", command=lambda: likear(texto_entry.get()))
-    empezar_button.grid(row=1, column=0, columnspan=2)
-
-def likear(texto):
-    print(f"Texto ingresado: {texto}")
-    # Aquí iría la lógica para dar like con el texto ingresado
+def accion(tipo, texto):
+    print(f"{tipo}: {texto}")
+    # Aquí iría la lógica para interactuar con Facebook según el tipo de acción
     # ...
 
-def comentario():
-    # funcion de comentar
-    return print("comentarios publicados")
 
-def publicar():
-    # funcion de comentar
-    return print("publicaciones realizadas")
+def crear_ventana(titulo, accion_tipo):
+    ventana_nueva = Toplevel(ventana)
+    ventana_nueva.title(titulo)
 
-def compartir():
-    # funcion de comentar
-    return print("compartido")
+    # Geometría (centrar la ventana)
+    width, height = 200, 150
+    x = (ventana_nueva.winfo_screenwidth() - width) // 2
+    y = (ventana_nueva.winfo_screenheight() - height) // 2
+    ventana_nueva.geometry(f"{width}x{height}+{x}+{y}")
+
+    # Recuadro para texto
+    Label(ventana_nueva, text="Texto:").grid(row=0, column=0)
+    texto_entry = Entry(ventana_nueva)
+    texto_entry.grid(row=0, column=1)
+
+    # Botón "Empezar"
+    Button(ventana_nueva, text="Empezar", command=lambda: accion(accion_tipo, texto_entry.get())).grid(row=1, column=0, columnspan=2)
+
 
 # Inicio de GUI
 ventana = Tk()
 ventana.title("Bot de Facebook")
 
-# Configuración de tamaño y posición de la ventana
-width, heigth = 300, 150
-puntoMedioAnchura , puntoMedioAlto = int((ventana.winfo_screenwidth()-width)/2), int((ventana.winfo_screenheight()-heigth)/2)
-ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+# Geometría (centrar la ventana principal)
+width, height = 300, 150
+x = (ventana.winfo_screenwidth() - width) // 2
+y = (ventana.winfo_screenheight() - height) // 2
+ventana.geometry(f"{width}x{height}+{x}+{y}")
 
-# Variables de posicionamiento
-posRowDiferencias, posColDiferencias  = 1 , 3
-posRowLimp , posColLimp = 1 , 1
-space, colcentral = 2 , 2
 
-#Etiquetas
-#mensaje = Label(ventana, text="Uso bajo Licencia").grid(row=5, column=colcentral)
-separador_0 = Label(ventana, text=" ").grid(row=0, column=colcentral)
-separador_2 = Label(ventana, text=" ").grid(row=2, column=colcentral)
+# Botones
+acciones = {
+    "Publicar": "publicar",
+    "Comentar": "comentar",
+    "Dar Like": "likear",
+    "Compartir": "compartir",
+}
 
-#Botones
-botonPublicar = Button(ventana, text="Publicar", command=ventanaPublicar)
-botonPublicar.grid(row=1, column=1, sticky="news")
-botonComentar = Button(ventana, text="Comentar", command=ventanaComentar)
-botonComentar.grid(row=3, column=1, sticky="news")
+for i, (texto_boton, accion_tipo) in enumerate(acciones.items()):
+    row = i % 2 + 1  # Alternar filas 1 y 3
+    col = i // 2 * 2 + 1 # Alternar columnas 1 y 3
+    Button(ventana, text=texto_boton, command=lambda tipo=accion_tipo: crear_ventana(texto_boton, tipo)).grid(row=row, column=col, sticky="news")
 
-botonLikear = Button(ventana, text="Dar Like", command=ventanaLikear)
-botonLikear.grid(row=1, column=3, sticky="news")
-botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir)
-botonCompartir.grid(row=3, column=3, sticky="news")
 
-# Expandir columnas hasta el borde (laterales)
-ventana.grid_columnconfigure(0, weight=1)
-ventana.grid_columnconfigure(1, weight=1)
-ventana.grid_columnconfigure(2, weight=1)
-ventana.grid_columnconfigure(3, weight=1)
-ventana.grid_columnconfigure(4, weight=1)
+# Expandir columnas hasta el borde (laterales y centrales)
+for i in range(5):
+    ventana.grid_columnconfigure(i, weight=1)
 
 # Bucle
 ventana.mainloop()
