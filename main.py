@@ -5,11 +5,10 @@ def libSetup(lib):
     try:ilib.import_module(lib)
     except ImportError:sub.check_call(['pip', 'install', lib])
 
-import os, time, csv
+import os, time, csv, datetime
 
 libSetup('tkinter')
 from tkinter import *
-from tkinter import messagebox
 
 libSetup('warnings')
 import warnings
@@ -103,11 +102,19 @@ def comentario():
 def publicar():
     driver = webdriver.Chrome()
     AccesoWEB(driver)
+    now = datetime.datetime.now()
+    current_hour = now.hour
     time.sleep(1)
 
     web = "https://www.facebook.com/groups/"
     objetivos = docCSV('./Objetivos/Grupos.csv')
-    post = "texto"
+
+    if current_hour < 13:
+        saludo = "Buen dia"
+    else:
+        saludo = "Buenas tardes"
+    post = docTXT("Post.txt")
+    link = docTXT("LinkImagenInternet.txt")
 
     for x in objetivos:
         driver.get(web+x)
@@ -118,7 +125,7 @@ def publicar():
             time.sleep(2)
             cajaPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Crea una publicación pública...')]/ancestor::div[contains(@role,'textbox')]")))
             selectCajaPost = Select(cajaPost)
-            selectCajaPost.send_keys(post)
+            selectCajaPost.send_keys(f"{saludo}, {post}. {link}")
         except (NoSuchElementException, TimeoutException) as e:
             print(e)
         print("publicacion realizada en: ",x)
@@ -148,6 +155,15 @@ def docCSV(documento):
         reader = csv.reader(csvfile)
         listado = {row[0]: row[0] for row in reader}
     return listado
+
+def docTXT(link):
+    try:
+        with open(f"./Publicacion/{link}", "r", encoding="utf-8") as texto:
+            archivo = texto.read()
+    except FileNotFoundError:
+        print(f"Error: {link} no existe.")
+        archivo = ""
+    return archivo
 
 # Inicio de GUI
 ventana = Tk()
