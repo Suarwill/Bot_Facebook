@@ -125,6 +125,7 @@ def publicar():
 
 def compartir():
     # funcion de comentar
+    # ajustando
     return print("compartido")
 
 def AccesoWEB(driver):
