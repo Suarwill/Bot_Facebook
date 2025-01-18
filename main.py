@@ -5,16 +5,33 @@ def libSetup(lib):
     try:ilib.import_module(lib)
     except ImportError:sub.check_call(['pip', 'install', lib])
 
+import os, time, csv
+
 libSetup('tkinter')
 from tkinter import *
 from tkinter import messagebox
+
+libSetup('warnings')
+import warnings
+
+libSetup('python-dotenv')
+from dotenv import load_dotenv
+
+libSetup('selenium')
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.alert import Alert
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
     ventanaPublicar.title("Dar Like")
 
     # Geometria
-    width, heigth = 200, 150
+    width, heigth = 200, 200
     puntoMedioAnchura , puntoMedioAlto = int((ventanaPublicar.winfo_screenwidth()-width)/4), int((ventanaPublicar.winfo_screenheight()-heigth)/4)
     ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
@@ -78,21 +95,59 @@ def ventanaCompartir():
     empezar_button.grid(row=1, column=0, columnspan=2)
 
 def likear(texto):
-    print(f"Texto ingresado: {texto}")
-    # Aquí iría la lógica para dar like con el texto ingresado
-    # ...
+    return print(texto)
 
 def comentario():
     # funcion de comentar
     return print("comentarios publicados")
 
 def publicar():
-    # funcion de comentar
-    return print("publicaciones realizadas")
+    driver = webdriver.Chrome()
+    AccesoWEB(driver)
+    time.sleep(1)
+
+    web = "https://www.facebook.com/groups/"
+    objetivos = docCSV('./Objetivos/Grupos.csv')
+    post = "texto"
+
+    for x in objetivos:
+        driver.get(web+x)
+        try:
+            botonPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Escribe algo...')]/ancestor::div[contains(@role,'textbox')]")))
+            selectBotonPost = Select(botonPost)
+            selectBotonPost.click()
+            time.sleep(2)
+            cajaPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Crea una publicación pública...')]/ancestor::div[contains(@role,'textbox')]")))
+            selectCajaPost = Select(cajaPost)
+            selectCajaPost.send_keys(post)
+        except (NoSuchElementException, TimeoutException) as e:
+            print(e)
+        print("publicacion realizada en: ",x)
 
 def compartir():
     # funcion de comentar
     return print("compartido")
+
+def AccesoWEB(driver):
+    web = "https://www.facebook.com"
+    login = "/login/"
+    userF = os.getenv("FACEBOOK_USERNAME")
+    passF = os.getenv("FACEBOOK_PASSWORD")
+
+    driver.get(web+login)
+    username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email_container")))
+    username_field.send_keys(userF)
+    password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "pass")))
+    password_field.send_keys(passF)
+    login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "loginbutton")))
+    login_button.click()
+    return
+
+def docCSV(documento):
+    with open(documento, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        listado = {row[0]: row[0] for row in reader}
+    return listado
 
 # Inicio de GUI
 ventana = Tk()
@@ -102,6 +157,9 @@ ventana.title("Bot de Facebook")
 width, heigth = 300, 150
 puntoMedioAnchura , puntoMedioAlto = int((ventana.winfo_screenwidth()-width)/2), int((ventana.winfo_screenheight()-heigth)/2)
 ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+
+warnings.filterwarnings("ignore", category=UserWarning)
+load_dotenv()
 
 # Variables de posicionamiento
 posRowDiferencias, posColDiferencias  = 1 , 3
