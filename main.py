@@ -26,22 +26,38 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
-    ventanaPublicar.title("Dar Like")
+    ventanaPublicar.title("Spam de Publicacion")
 
     # Geometria
-    width, heigth = 200, 200
+    width, heigth = 500, 400
     puntoMedioAnchura , puntoMedioAlto = int((ventanaPublicar.winfo_screenwidth()-width)/4), int((ventanaPublicar.winfo_screenheight()-heigth)/4)
     ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
-    # Recuadro para texto
-    texto_label = Label(ventanaPublicar, text="Texto:")
-    texto_label.grid(row=0, column=0)
-    texto_entry = Entry(ventanaPublicar)
-    texto_entry.grid(row=0, column=1)
+    # Recuadro para el post
+    post_label = Label(ventanaPublicar, text="Post:")
+    post_label.grid(row=0, column=0, padx=5, pady=5)
+    post_entry = Text(ventanaPublicar, width=30, height=8)
+    post_entry.grid(row=0, column=1, padx=5, pady=5)
 
-    # Botón "Empezar"
-    empezar_button = Button(ventanaPublicar, text="Empezar", command=lambda: likear(texto_entry.get()))
-    empezar_button.grid(row=1, column=0, columnspan=2)
+    # Recuadro para el link
+    link_label = Label(ventanaPublicar, text="Link:")
+    link_label.grid(row=1, column=0, padx=5, pady=5)
+    link_entry = Entry(ventanaPublicar, width=30)
+    link_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    def guardar_texto():
+        post = post_entry.get("1.0", "end-1c")
+        link = link_entry.get()
+        with open("./Publicacion/Post.txt", "w", encoding="utf-8") as contenido:
+            contenido.write(post)
+        with open("./Publicacion/LinkImagenInternet.txt", "w", encoding="utf-8") as enlace:
+            enlace.write(link)
+        print("Archivos actualizados con éxito.")
+
+    guardar_button = Button(ventanaPublicar, text="Guardar", command=guardar_texto)
+    guardar_button.grid(row=2, column=0, columnspan=2, pady=10)
+    publicar_button = Button(ventanaPublicar, text="Publicar", command=publicar)
+    publicar_button.grid(row=3, column=0, columnspan=2, pady=5)
 
 def ventanaLikear():
     ventanaLikear = Toplevel(ventana)
@@ -104,7 +120,7 @@ def publicar():
     AccesoWEB(driver)
     now = datetime.datetime.now()
     current_hour = now.hour
-    time.sleep(1)
+    time.sleep(20)
 
     web = "https://www.facebook.com/groups/"
     objetivos = docCSV('./Objetivos/Grupos.csv')
@@ -120,12 +136,12 @@ def publicar():
         driver.get(web+x)
         try:
             botonPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Escribe algo...')]/ancestor::div[contains(@role,'textbox')]")))
-            selectBotonPost = Select(botonPost)
-            selectBotonPost.click()
+            botonPost.click()
             time.sleep(2)
             cajaPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Crea una publicación pública...')]/ancestor::div[contains(@role,'textbox')]")))
-            selectCajaPost = Select(cajaPost)
-            selectCajaPost.send_keys(f"{saludo}, {post}. {link}")
+            cajaPost.send_keys(f"{saludo}, {post}. {link}")
+            botonPublicar  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Publicar')]/ancestor::div[contains(@role,'textbox')]")))
+            botonPublicar.click()
         except (NoSuchElementException, TimeoutException) as e:
             print(e)
         print("publicacion realizada en: ",x)
@@ -139,10 +155,12 @@ def AccesoWEB(driver):
     web = "https://www.facebook.com"
     login = "/login/"
     userF = os.getenv("FACEBOOK_USERNAME")
+    print(userF)
     passF = os.getenv("FACEBOOK_PASSWORD")
+    print(passF)
 
     driver.get(web+login)
-    username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email_container")))
+    username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email")))
     username_field.send_keys(userF)
     password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "pass")))
     password_field.send_keys(passF)
@@ -164,6 +182,7 @@ def docTXT(link):
         print(f"Error: {link} no existe.")
         archivo = ""
     return archivo
+
 
 # Inicio de GUI
 ventana = Tk()
