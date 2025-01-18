@@ -20,6 +20,7 @@ libSetup('selenium')
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
@@ -116,11 +117,15 @@ def comentario():
     return print("comentarios publicados")
 
 def publicar():
-    driver = webdriver.Chrome()
+    options = Options()
+    chrome_profile_path = os.path.expandvars(os.getenv("PERFIL_CHROME"))
+    options.add_argument("--disable-notifications")
+    options.add_argument(f"user-data-dir={chrome_profile_path}")
+    driver = webdriver.Chrome(options=options)
     AccesoWEB(driver)
+        
     now = datetime.datetime.now()
     current_hour = now.hour
-    time.sleep(20)
 
     web = "https://www.facebook.com/groups/"
     objetivos = docCSV('./Objetivos/Grupos.csv')
@@ -131,20 +136,23 @@ def publicar():
         saludo = "Buenas tardes"
     post = docTXT("Post.txt")
     link = docTXT("LinkImagenInternet.txt")
+    mensaje = (f"{saludo},\n{post}.\n{link}")
+    print(mensaje)
 
     for x in objetivos:
         driver.get(web+x)
         try:
-            botonPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Escribe algo...')]/ancestor::div[contains(@role,'textbox')]")))
+            botonPost  =        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Escribe algo...']")))
             botonPost.click()
             time.sleep(2)
-            cajaPost  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Crea una publicación pública...')]/ancestor::div[contains(@role,'textbox')]")))
-            cajaPost.send_keys(f"{saludo}, {post}. {link}")
-            botonPublicar  = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Publicar')]/ancestor::div[contains(@role,'textbox')]")))
+            cajaPost  =         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Crea una publicación']")))
+            cajaPost.click()
+            cajaPost.send_keys(mensaje)
+            botonPublicar  =    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Publicar']")))
             botonPublicar.click()
         except (NoSuchElementException, TimeoutException) as e:
             print(e)
-        print("publicacion realizada en: ",x)
+        print(f"publicacion realizada en: {x}")
 
 def compartir():
     # funcion de comentar
@@ -158,14 +166,17 @@ def AccesoWEB(driver):
     print(userF)
     passF = os.getenv("FACEBOOK_PASSWORD")
     print(passF)
-
-    driver.get(web+login)
-    username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email")))
-    username_field.send_keys(userF)
-    password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "pass")))
-    password_field.send_keys(passF)
-    login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "loginbutton")))
-    login_button.click()
+    try:
+        driver.get(web+login)
+        username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email")))
+        username_field.send_keys(userF)
+        password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "pass")))
+        password_field.send_keys(passF)
+        login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "loginbutton")))
+        login_button.click()
+        time.sleep(50)
+    except:
+        print("no se pudo iniciar sesion")
     return
 
 def docCSV(documento):
