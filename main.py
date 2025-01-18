@@ -4,18 +4,13 @@ def libSetup(lib):
     # Funcion para instalar automaticamente librerias no existentes
     try:ilib.import_module(lib)
     except ImportError:sub.check_call(['pip', 'install', lib])
-
 import os, time, csv, datetime
-
 libSetup('tkinter')
 from tkinter import *
-
 libSetup('warnings')
 import warnings
-
 libSetup('python-dotenv')
 from dotenv import load_dotenv
-
 libSetup('selenium')
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -24,6 +19,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
+def ventanaConfigurar():
+    return
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
@@ -31,7 +28,8 @@ def ventanaPublicar():
 
     # Geometria
     width, heigth = 500, 400
-    puntoMedioAnchura , puntoMedioAlto = int((ventanaPublicar.winfo_screenwidth()-width)/4), int((ventanaPublicar.winfo_screenheight()-heigth)/4)
+    puntoMedioAnchura = int((ventanaPublicar.winfo_screenwidth()-width)/4)
+    puntoMedioAlto = int((ventanaPublicar.winfo_screenheight()-heigth)/4)
     ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
     # Recuadro para el post
@@ -66,7 +64,8 @@ def ventanaLikear():
 
     # Geometria
     width, heigth = 200, 150
-    puntoMedioAnchura , puntoMedioAlto = int((ventanaLikear.winfo_screenwidth()-width)/4), int((ventanaLikear.winfo_screenheight()-heigth)/4)
+    puntoMedioAnchura = int((ventanaLikear.winfo_screenwidth()-width)/4)
+    puntoMedioAlto = int((ventanaLikear.winfo_screenheight()-heigth)/4)
     ventanaLikear.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
     # Recuadro para texto
@@ -142,13 +141,16 @@ def publicar():
     for x in objetivos:
         driver.get(web+x)
         try:
-            botonPost  =        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Escribe algo...']")))
+            botonPost  = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//span[text()='Escribe algo...']")))
             botonPost.click()
             time.sleep(2)
-            cajaPost  =         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Crea una publicación']")))
+            cajaPost  = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//span[text()='Crea una publicación']")))
             cajaPost.click()
             cajaPost.send_keys(mensaje)
-            botonPublicar  =    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Publicar']")))
+            botonPublicar  = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//span[text()='Publicar']")))
             botonPublicar.click()
         except (NoSuchElementException, TimeoutException) as e:
             print(e)
@@ -159,6 +161,33 @@ def compartir():
     # ajustando
     return print("compartido")
 
+def creacionEntorno():
+    if not os.path.exists(".env"):
+        with open(".env", "w") as env_file:
+            env_file.write("FACEBOOK_USERNAME=\n")
+            env_file.write("FACEBOOK_PASSWORD=\n")
+            chrome = "%APPDATA%/Google/Chrome"
+            env_file.write(f"PERFIL_CHROME={chrome}")
+
+    if not os.path.exists("Objetivos"):
+        os.makedirs("Objetivos")
+    if not os.path.exists("Publicacion"):
+        os.makedirs("Publicacion")
+
+    if not os.path.exists("Objetivos/Grupos.csv"):
+        with open("Objetivos/Grupos.csv", "w", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["Grupo1"])
+
+    if not os.path.exists("Publicacion/Post.txt"):
+        open("Publicacion/Post.txt", "w").close()
+    if not os.path.exists("Publicacion/LinkImagenInternet.txt"):
+        open("Publicacion/LinkImagenInternet.txt", "w").close()
+        print("entorno creado!")
+    return 
+
+creacionEntorno()
+
 def AccesoWEB(driver):
     web = "https://www.facebook.com"
     login = "/login/"
@@ -168,15 +197,18 @@ def AccesoWEB(driver):
     print(passF)
     try:
         driver.get(web+login)
-        username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email")))
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "email")))
         username_field.send_keys(userF)
-        password_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "pass")))
+        password_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "pass")))
         password_field.send_keys(passF)
-        login_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "loginbutton")))
+        login_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "loginbutton")))
         login_button.click()
         time.sleep(50)
     except:
-        print("no se pudo iniciar sesion")
+        print("continuando...")
     return
 
 def docCSV(documento):
@@ -194,28 +226,22 @@ def docTXT(link):
         archivo = ""
     return archivo
 
-
 # Inicio de GUI
 ventana = Tk()
 ventana.title("Bot de Facebook")
 
 # Configuración de tamaño y posición de la ventana
-width, heigth = 300, 150
-puntoMedioAnchura , puntoMedioAlto = int((ventana.winfo_screenwidth()-width)/2), int((ventana.winfo_screenheight()-heigth)/2)
+width, heigth = 400, 300
+puntoMedioAnchura = int((ventana.winfo_screenwidth()-width)/2)
+puntoMedioAlto = int((ventana.winfo_screenheight()-heigth)/2)
 ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
 warnings.filterwarnings("ignore", category=UserWarning)
 load_dotenv()
 
-# Variables de posicionamiento
-posRowDiferencias, posColDiferencias  = 1 , 3
-posRowLimp , posColLimp = 1 , 1
-space, colcentral = 2 , 2
-
 #Etiquetas
-#mensaje = Label(ventana, text="Uso bajo Licencia").grid(row=5, column=colcentral)
-separador_0 = Label(ventana, text=" ").grid(row=0, column=colcentral)
-separador_2 = Label(ventana, text=" ").grid(row=2, column=colcentral)
+for x in [0,2,4]:
+    separador = Label(ventana, text=" ").grid(row=x, column=x)
 
 #Botones
 botonPublicar = Button(ventana, text="Publicar", command=ventanaPublicar)
@@ -228,12 +254,12 @@ botonLikear.grid(row=1, column=3, sticky="news")
 botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir)
 botonCompartir.grid(row=3, column=3, sticky="news")
 
+botonCompartir = Button(ventana, text="⚙ Cfg.", command=ventanaConfigurar)
+botonCompartir.grid(row=5, column=3, sticky="news")
+
 # Expandir columnas hasta el borde (laterales)
-ventana.grid_columnconfigure(0, weight=1)
-ventana.grid_columnconfigure(1, weight=1)
-ventana.grid_columnconfigure(2, weight=1)
-ventana.grid_columnconfigure(3, weight=1)
-ventana.grid_columnconfigure(4, weight=1)
+for x in range(0,5):
+    ventana.grid_columnconfigure(x, weight=1)
 
 # Bucle
 ventana.mainloop()
