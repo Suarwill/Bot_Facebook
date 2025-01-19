@@ -10,7 +10,7 @@ from tkinter import *
 libSetup('warnings')
 import warnings
 libSetup('python-dotenv')
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 libSetup('selenium')
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -20,13 +20,41 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 def ventanaConfigurar():
-    return
+    ventanaConfigurar = Toplevel(ventana)
+    ventanaConfigurar.title("Configuraciones")
+
+    # Geometria
+    width, heigth = 300, 400
+    puntoMedioAnchura = int((ventanaConfigurar.winfo_screenwidth()-width)/4)
+    puntoMedioAlto = int((ventanaConfigurar.winfo_screenheight()-heigth)/4)
+    ventanaConfigurar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+    
+    user_label = Label(ventanaConfigurar, text="Usuario: ")
+    user_label.grid(row=0, column=0, padx=5, pady=5)
+    user_entry = Entry(ventanaConfigurar, width=30)
+    user_entry.grid(row=0, column=1, padx=5, pady=5)
+    
+    pass_label = Label(ventanaConfigurar, text="Contraseña: ")
+    pass_label.grid(row=1, column=0, padx=5, pady=5)
+    pass_entry = Entry(ventanaConfigurar, width=30)
+    pass_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    def guardar():
+        user = user_entry.get()
+        password = pass_entry.get()
+        if os.path.exists('.env'):
+            load_dotenv()
+        set_key(".env", "FACEBOOK_USERNAME", user)
+        set_key(".env", "FACEBOOK_PASSWORD", password)
+        print("Archivos actualizados con éxito.")
+    
+    guardar_button = Button(ventanaConfigurar, text="Guardar", command=guardar)
+    guardar_button.grid(row=5, column=1, columnspan=2, pady=10)
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
     ventanaPublicar.title("Spam de Publicacion")
 
-    # Geometria
     width, heigth = 500, 400
     puntoMedioAnchura = int((ventanaPublicar.winfo_screenwidth()-width)/4)
     puntoMedioAlto = int((ventanaPublicar.winfo_screenheight()-heigth)/4)
@@ -186,8 +214,6 @@ def creacionEntorno():
         print("entorno creado!")
     return 
 
-creacionEntorno()
-
 def AccesoWEB(driver):
     web = "https://www.facebook.com"
     login = "/login/"
@@ -238,6 +264,7 @@ ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
 warnings.filterwarnings("ignore", category=UserWarning)
 load_dotenv()
+creacionEntorno()
 
 #Etiquetas
 for x in [0,2,4]:
