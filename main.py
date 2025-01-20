@@ -85,7 +85,7 @@ def ventanaPublicar():
             contenido.write(post)
         with open("./Publicacion/LinkImagenInternet.txt", "w", encoding="utf-8") as enlace:
             enlace.write(link)
-        print("Archivos actualizados con éxito.")
+        return print("Archivos actualizados con éxito.")
 
     guardar_button = Button(ventanaPublicar, text="Guardar", command=guardar_texto)
     guardar_button.grid(row=2, column=1, columnspan=1, pady=10)
@@ -163,10 +163,12 @@ def publicar():
     web = "https://www.facebook.com/groups/"
     objetivos = docCSV('./Objetivos/Grupos.csv')
 
-    if current_hour < 13:
-        saludo = "Buen dia"
-    else:
+    if current_hour > 19 or current_hour < 4:
+        saludo = "Buenas noches"
+    elif current_hour > 12:
         saludo = "Buenas tardes"
+    else:
+        saludo = "Buen dia"
     post = docTXT("Post.txt")
     link = docTXT("LinkImagenInternet.txt")
     mensaje = (f"{saludo},\n{post}.\n{link}")
