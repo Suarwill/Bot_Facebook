@@ -290,6 +290,7 @@ botonCompartir.grid(row=3, column=3, sticky="news")
 botonCompartir = Button(ventana, text="⚙ Cfg.", command=ventanaConfigurar, background= "lightblue")
 botonCompartir.grid(row=5, column=3, sticky="news")
 
+
 # Expandir columnas hasta el borde (laterales)
 for x in range(0,5):
     ventana.grid_columnconfigure(x, weight=1)
@@ -299,3 +300,8 @@ creacionEntorno()
 
 # Bucle
 ventana.mainloop()
+
+# ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ #
+# Crear Paquete EXE                                               #
+# pyinstaller --onefile main.py                                   #
+# ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ ═ #
