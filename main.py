@@ -7,6 +7,7 @@ def libSetup(lib):
 import os, time, csv, datetime
 libSetup('tkinter')
 from tkinter import *
+import tkinter.ttk as ttk
 libSetup('warnings')
 import warnings
 libSetup('python-dotenv')
@@ -24,7 +25,7 @@ def ventanaConfigurar():
     ventanaConfigurar.title("Configuraciones")
 
     # Geometria
-    width, heigth = 300, 400
+    width, heigth = 300, 200
     puntoMedioAnchura = int((ventanaConfigurar.winfo_screenwidth()-width)/4)
     puntoMedioAlto = int((ventanaConfigurar.winfo_screenheight()-heigth)/4)
     ventanaConfigurar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
@@ -55,7 +56,7 @@ def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
     ventanaPublicar.title("Spam de Publicacion")
 
-    width, heigth = 500, 400
+    width, heigth = 300, 400
     puntoMedioAnchura = int((ventanaPublicar.winfo_screenwidth()-width)/4)
     puntoMedioAlto = int((ventanaPublicar.winfo_screenheight()-heigth)/4)
     ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
@@ -72,6 +73,11 @@ def ventanaPublicar():
     link_entry = Entry(ventanaPublicar, width=30)
     link_entry.grid(row=1, column=1, padx=5, pady=5)
 
+    post = docTXT("/Post.txt")
+    post_entry.insert("1.0", post)
+    link = docTXT("LinkImagenInternet.txt")
+    link_entry.insert(0, link)
+
     def guardar_texto():
         post = post_entry.get("1.0", "end-1c")
         link = link_entry.get()
@@ -82,9 +88,9 @@ def ventanaPublicar():
         print("Archivos actualizados con éxito.")
 
     guardar_button = Button(ventanaPublicar, text="Guardar", command=guardar_texto)
-    guardar_button.grid(row=2, column=0, columnspan=2, pady=10)
+    guardar_button.grid(row=2, column=1, columnspan=1, pady=10)
     publicar_button = Button(ventanaPublicar, text="Publicar", command=publicar)
-    publicar_button.grid(row=3, column=0, columnspan=2, pady=5)
+    publicar_button.grid(row=3, column=1, columnspan=1, pady=5)
 
 def ventanaLikear():
     ventanaLikear = Toplevel(ventana)
@@ -174,16 +180,17 @@ def publicar():
             botonPost.click()
             time.sleep(2)
             cajaPost  = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//span[text()='Crea una publicación']")))
-            cajaPost.click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, "span[data-offset-key]")))
             cajaPost.send_keys(mensaje)
             botonPublicar  = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//span[text()='Publicar']")))
             botonPublicar.click()
+            print(f"publicacion realizada en: {x}")
         except (NoSuchElementException, TimeoutException) as e:
             print(e)
-        print(f"publicacion realizada en: {x}")
-
+    print("publicaciones realizadas")
+    driver.quit()
+        
 def compartir():
     # funcion de comentar
     # ajustando
@@ -255,6 +262,7 @@ def docTXT(link):
 # Inicio de GUI
 ventana = Tk()
 ventana.title("Bot de Facebook")
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # Configuración de tamaño y posición de la ventana
 width, heigth = 400, 300
@@ -262,31 +270,30 @@ puntoMedioAnchura = int((ventana.winfo_screenwidth()-width)/2)
 puntoMedioAlto = int((ventana.winfo_screenheight()-heigth)/2)
 ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
-warnings.filterwarnings("ignore", category=UserWarning)
-load_dotenv()
-creacionEntorno()
-
 #Etiquetas
 for x in [0,2,4]:
     separador = Label(ventana, text=" ").grid(row=x, column=x)
 
 #Botones
-botonPublicar = Button(ventana, text="Publicar", command=ventanaPublicar)
+botonPublicar = Button(ventana, text="Publicar", command=ventanaPublicar, background= "lightblue")
 botonPublicar.grid(row=1, column=1, sticky="news")
-botonComentar = Button(ventana, text="Comentar", command=ventanaComentar)
+botonComentar = Button(ventana, text="Comentar", command=ventanaComentar, background= "lightblue")
 botonComentar.grid(row=3, column=1, sticky="news")
 
-botonLikear = Button(ventana, text="Dar Like", command=ventanaLikear)
+botonLikear = Button(ventana, text="Dar Like", command=ventanaLikear, background= "lightblue")
 botonLikear.grid(row=1, column=3, sticky="news")
-botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir)
+botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir, background= "lightblue")
 botonCompartir.grid(row=3, column=3, sticky="news")
 
-botonCompartir = Button(ventana, text="⚙ Cfg.", command=ventanaConfigurar)
+botonCompartir = Button(ventana, text="⚙ Cfg.", command=ventanaConfigurar, background= "lightblue")
 botonCompartir.grid(row=5, column=3, sticky="news")
 
 # Expandir columnas hasta el borde (laterales)
 for x in range(0,5):
     ventana.grid_columnconfigure(x, weight=1)
+
+load_dotenv()
+creacionEntorno()
 
 # Bucle
 ventana.mainloop()
