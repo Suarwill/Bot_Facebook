@@ -21,9 +21,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 def ventanaConfigurar():
+    load_dotenv(override=True)
     ventanaConfigurar = Toplevel(ventana)
     ventanaConfigurar.title("Configuraciones")
-
+    
     # Geometria
     width, heigth = 300, 200
     puntoMedioAnchura = int((ventanaConfigurar.winfo_screenwidth()-width)/4)
@@ -40,17 +41,24 @@ def ventanaConfigurar():
     pass_entry = Entry(ventanaConfigurar, width=30)
     pass_entry.grid(row=1, column=1, padx=5, pady=5)
 
+    user = codec(os.getenv("FACEBOOK_USERNAME"),False)
+    user_entry.insert(0,user)
+    pasw = codec(os.getenv("FACEBOOK_PASSWORD"),False)
+    pass_entry.insert(0,pasw)
+
     def guardar():
-        user = user_entry.get()
-        password = pass_entry.get()
+        user = codec(user_entry.get())
+        password = codec(pass_entry.get())
         if os.path.exists('.env'):
-            load_dotenv()
-        set_key(".env", "FACEBOOK_USERNAME", user)
-        set_key(".env", "FACEBOOK_PASSWORD", password)
+            set_key(".env", "FACEBOOK_USERNAME", user)
+            set_key(".env", "FACEBOOK_PASSWORD", password)
         print("Archivos actualizados con éxito.")
+        ventanaConfigurar.destroy()
     
     guardar_button = Button(ventanaConfigurar, text="Guardar", command=guardar)
     guardar_button.grid(row=5, column=1, columnspan=2, pady=10)
+
+    ventanaConfigurar.mainloop()
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
@@ -226,10 +234,9 @@ def creacionEntorno():
 def AccesoWEB(driver):
     web = "https://www.facebook.com"
     login = "/login/"
-    userF = os.getenv("FACEBOOK_USERNAME")
-    print(userF)
-    passF = os.getenv("FACEBOOK_PASSWORD")
-    print(passF)
+    load_dotenv(override=True)
+    userF = codec(os.getenv("FACEBOOK_USERNAME"),False)
+    passF = codec(os.getenv("FACEBOOK_PASSWORD"),False)
     try:
         driver.get(web+login)
         username_field = WebDriverWait(driver, 10).until(
@@ -245,6 +252,18 @@ def AccesoWEB(driver):
     except:
         print("continuando...")
     return
+
+def codec(w, cifrar=True):
+    x , i = "" , 1
+    for c in w:
+        y = ord(c)
+        if cifrar : nV = (y+i)%256
+        else: nV = (y-i)%256
+        i += 1
+        nV = max(0, min(nV, 0x10FFFF))
+        nC = chr(nV)
+        x += nC
+    return x
 
 def docCSV(documento):
     with open(documento, 'r') as csvfile:
@@ -271,6 +290,7 @@ width, heigth = 400, 300
 puntoMedioAnchura = int((ventana.winfo_screenwidth()-width)/2)
 puntoMedioAlto = int((ventana.winfo_screenheight()-heigth)/2)
 ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+load_dotenv()
 
 #Etiquetas
 for x in [0,2,4]:
@@ -295,7 +315,6 @@ botonCompartir.grid(row=5, column=3, sticky="news")
 for x in range(0,5):
     ventana.grid_columnconfigure(x, weight=1)
 
-load_dotenv()
 creacionEntorno()
 
 # Bucle
