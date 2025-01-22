@@ -89,24 +89,16 @@ def ventanaPublicar():
     publicar_button = Button(ventanaPublicar, text="Publicar", command=publicar)
     publicar_button.grid(row=3, column=1, columnspan=1, pady=5)
 
-def ventanaLikear():
-    ventanaLikear = Toplevel(ventana)
-    ventanaLikear.title("Dar Like")
-
-    # Geometria
-    width, heigth = 200, 150
-    puntoMedioAnchura = int((ventanaLikear.winfo_screenwidth()-width)/4)
-    puntoMedioAlto = int((ventanaLikear.winfo_screenheight()-heigth)/4)
-    ventanaLikear.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
-
-    # Recuadro para texto
-    texto_label = Label(ventanaLikear, text="Texto:")
+def ventanaGrupo():
+    ventanaGrupo = Toplevel(ventana)
+    crearVentana(ventanaGrupo,"Agregar Grupo",300,500)
+    texto_label = Label(ventanaGrupo, text="Texto:")
     texto_label.grid(row=0, column=0)
-    texto_entry = Entry(ventanaLikear)
+    texto_entry = Entry(ventanaGrupo)
     texto_entry.grid(row=0, column=1)
 
     # Botón "Empezar"
-    empezar_button = Button(ventanaLikear, text="Empezar", command=lambda: likear(texto_entry.get()))
+    empezar_button = Button(ventanaGrupo, text="Empezar", command=lambda: likear(texto_entry.get()))
     empezar_button.grid(row=1, column=0, columnspan=2)
 
 def ventanaComentar():
@@ -298,7 +290,7 @@ botonPublicar.grid(row=1, column=1, sticky="news")
 botonComentar = Button(ventana, text="Comentar", command=ventanaComentar, background= "lightblue")
 botonComentar.grid(row=3, column=1, sticky="news")
 
-botonLikear = Button(ventana, text="Dar Like", command=ventanaLikear, background= "lightblue")
+botonLikear = Button(ventana, text="Dar Like", command=ventanaGrupo, background= "lightblue")
 botonLikear.grid(row=1, column=3, sticky="news")
 botonCompartir = Button(ventana, text="Compartir", command=ventanaCompartir, background= "lightblue")
 botonCompartir.grid(row=3, column=3, sticky="news")
