@@ -72,7 +72,7 @@ def ventanaPublicar():
 
     post = docTXT("/Post.txt")
     post_entry.insert("1.0", post)
-    link = docTXT("LinkImagenInternet.txt")
+    link = docTXT("Link.txt")
     link_entry.insert(0, link)
 
     def guardar_texto():
@@ -80,7 +80,7 @@ def ventanaPublicar():
         link = link_entry.get()
         with open("./Publicacion/Post.txt", "w", encoding="utf-8") as contenido:
             contenido.write(post)
-        with open("./Publicacion/LinkImagenInternet.txt", "w", encoding="utf-8") as enlace:
+        with open("./Publicacion/Link.txt", "w", encoding="utf-8") as enlace:
             enlace.write(link)
         return print("Archivos actualizados con éxito.")
 
@@ -167,7 +167,7 @@ def publicar():
         saludo = "Buen dia"
 
     post = docTXT("Post.txt")
-    link = docTXT("LinkImagenInternet.txt")
+    link = docTXT("Link.txt")
     mensaje = (f"{saludo},\n{post}.\n{link}")
 
     for x in objetivos:
