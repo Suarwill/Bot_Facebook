@@ -59,37 +59,31 @@ def ventanaPublicar():
     crearVentana(ventanaPublicar,"Spam de Publicacion",500,400)
     filaInicial = 0
 
-    # Recuadro para el titulo
     tituloLabel = Label(ventanaPublicar, text="Archivo:")
     tituloLabel.grid(row=filaInicial, column=0, padx=5, pady=5)
     tituloEntry = Text(ventanaPublicar, width=30, height=1)
     tituloEntry.grid(row=filaInicial, column=1, padx=5, pady=5)
 
-    # Recuadro para el post
     postLabel = Label(ventanaPublicar, text="Post:")
     postLabel.grid(row=filaInicial+1, column=0, padx=5, pady=5)
     postEntry = Text(ventanaPublicar, width=30, height=10)
     postEntry.grid(row=filaInicial+1, column=1, padx=5, pady=5)
 
-    # Recuadro para el link
     linkLabel = Label(ventanaPublicar, text="Le recomiendo insertar un link hacia su aviso con fotos, al final del texto")
     linkLabel.grid(row=filaInicial+2, column=1, padx=5, pady=5)
 
-    # Selector de publicaciones
     publicaciones_label = Label(ventanaPublicar, text="Publicaciones Guardadas:")
     publicaciones_label.grid(row=filaInicial+3, column=0, padx=5, pady=5)
 
-    # Obtener lista de publicaciones guardadas
-    lista_publicaciones = os.listdir("./Publicacion") 
-    lista_publicaciones = [f for f in lista_publicaciones if f.endswith(".txt")] 
+    publicaciones = os.listdir("./Publicacion") 
+    publicaciones = [f for f in publicaciones if f.endswith(".txt")] 
 
-    # Crear lista desplegable
     publicaciones_var = StringVar(ventanaPublicar)
-    publicaciones_var.set(lista_publicaciones[0])  # Seleccionar la primera publicación por defecto
-    publicaciones_menu = OptionMenu(ventanaPublicar, publicaciones_var, *lista_publicaciones)
+    publicaciones_var.set(publicaciones[0])
+    publicaciones_menu = OptionMenu(ventanaPublicar, publicaciones_var, *publicaciones)
     publicaciones_menu.grid(row=filaInicial+3, column=1, padx=5, pady=5)
 
-    def cargar_publicacion():
+    def cargar_publ():
         seleccionada = publicaciones_var.get()
         with open(f"./Publicacion/{seleccionada}", "r", encoding="utf-8") as archivo:
             contenido = archivo.read()
@@ -97,15 +91,15 @@ def ventanaPublicar():
             postEntry.delete("1.0", END)
             postEntry.insert("1.0", contenido)
 
-    cargar_button = Button(ventanaPublicar, text="Cargar", command=cargar_publicacion)
+    cargar_button = Button(ventanaPublicar, text="Cargar", command=cargar_publ)
     cargar_button.grid(row=filaInicial+3, column=2, padx=5, pady=5)
 
-    def guardar_texto(tituloEntry, postEntry):
+    def guardar_cont(tituloEntry, postEntry):
         with open(f"./Publicacion/Post{tituloEntry.get("1.0", "end-1c")}.txt", "w", encoding="utf-8") as contenido:
             contenido.write(postEntry.get("1.0", "end-1c"))
         return print("Archivos actualizados con éxito.")
 
-    guardar_button = Button(ventanaPublicar, text="Guardar", command=lambda  : guardar_texto(tituloEntry, postEntry) )
+    guardar_button = Button(ventanaPublicar, text="Guardar", command=lambda  : guardar_cont(tituloEntry, postEntry) )
     guardar_button.grid(row=filaInicial+6, column=1, columnspan=1, pady=5)
     publicar_button = Button(ventanaPublicar, text="Publicar", command=publicar)
     publicar_button.grid(row=filaInicial+7, column=1, columnspan=1, pady=5)
@@ -118,7 +112,6 @@ def ventanaGrupo():
     texto_entry = Entry(ventanaGrupo)
     texto_entry.grid(row=0, column=1)
 
-    # Botón "Empezar"
     empezar_button = Button(ventanaGrupo, text="Empezar", command=lambda: likear(texto_entry.get()))
     empezar_button.grid(row=1, column=0, columnspan=2)
 
