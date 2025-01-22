@@ -210,8 +210,8 @@ def creacionEntorno():
 
     if not os.path.exists("Publicacion/Post.txt"):
         open("Publicacion/Post.txt", "w").close()
-    if not os.path.exists("Publicacion/LinkImagenInternet.txt"):
-        open("Publicacion/LinkImagenInternet.txt", "w").close()
+    if not os.path.exists("Publicacion/Link.txt"):
+        open("Publicacion/Link.txt", "w").close()
 
     return print("entorno creado!")
 
