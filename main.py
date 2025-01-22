@@ -56,38 +56,59 @@ def ventanaConfigurar():
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
-    crearVentana(ventanaPublicar,"Spam de Publicacion",400,300)
+    crearVentana(ventanaPublicar,"Spam de Publicacion",500,400)
+    filaInicial = 0
+
+    # Recuadro para el titulo
+    tituloLabel = Label(ventanaPublicar, text="Archivo:")
+    tituloLabel.grid(row=filaInicial, column=0, padx=5, pady=5)
+    tituloEntry = Text(ventanaPublicar, width=30, height=1)
+    tituloEntry.grid(row=filaInicial, column=1, padx=5, pady=5)
 
     # Recuadro para el post
-    post_label = Label(ventanaPublicar, text="Post:")
-    post_label.grid(row=0, column=0, padx=5, pady=5)
-    post_entry = Text(ventanaPublicar, width=30, height=8)
-    post_entry.grid(row=0, column=1, padx=5, pady=5)
+    postLabel = Label(ventanaPublicar, text="Post:")
+    postLabel.grid(row=filaInicial+1, column=0, padx=5, pady=5)
+    postEntry = Text(ventanaPublicar, width=30, height=10)
+    postEntry.grid(row=filaInicial+1, column=1, padx=5, pady=5)
 
     # Recuadro para el link
-    link_label = Label(ventanaPublicar, text="Link:")
-    link_label.grid(row=1, column=0, padx=5, pady=5)
-    link_entry = Entry(ventanaPublicar, width=30)
-    link_entry.grid(row=1, column=1, padx=5, pady=5)
+    linkLabel = Label(ventanaPublicar, text="Le recomiendo insertar un link hacia su aviso con fotos, al final del texto")
+    linkLabel.grid(row=filaInicial+2, column=1, padx=5, pady=5)
 
-    post = docTXT("/Post.txt")
-    post_entry.insert("1.0", post)
-    link = docTXT("Link.txt")
-    link_entry.insert(0, link)
+    # Selector de publicaciones
+    publicaciones_label = Label(ventanaPublicar, text="Publicaciones Guardadas:")
+    publicaciones_label.grid(row=filaInicial+3, column=0, padx=5, pady=5)
 
-    def guardar_texto():
-        post = post_entry.get("1.0", "end-1c")
-        link = link_entry.get()
-        with open("./Publicacion/Post.txt", "w", encoding="utf-8") as contenido:
-            contenido.write(post)
-        with open("./Publicacion/Link.txt", "w", encoding="utf-8") as enlace:
-            enlace.write(link)
+    # Obtener lista de publicaciones guardadas
+    lista_publicaciones = os.listdir("./Publicacion") 
+    lista_publicaciones = [f for f in lista_publicaciones if f.endswith(".txt")] 
+
+    # Crear lista desplegable
+    publicaciones_var = StringVar(ventanaPublicar)
+    publicaciones_var.set(lista_publicaciones[0])  # Seleccionar la primera publicación por defecto
+    publicaciones_menu = OptionMenu(ventanaPublicar, publicaciones_var, *lista_publicaciones)
+    publicaciones_menu.grid(row=filaInicial+3, column=1, padx=5, pady=5)
+
+    def cargar_publicacion():
+        seleccionada = publicaciones_var.get()
+        with open(f"./Publicacion/{seleccionada}", "r", encoding="utf-8") as archivo:
+            contenido = archivo.read()
+        if seleccionada.startswith("Post"):
+            postEntry.delete("1.0", END)
+            postEntry.insert("1.0", contenido)
+
+    cargar_button = Button(ventanaPublicar, text="Cargar", command=cargar_publicacion)
+    cargar_button.grid(row=filaInicial+3, column=2, padx=5, pady=5)
+
+    def guardar_texto(tituloEntry, postEntry):
+        with open(f"./Publicacion/Post{tituloEntry.get("1.0", "end-1c")}.txt", "w", encoding="utf-8") as contenido:
+            contenido.write(postEntry.get("1.0", "end-1c"))
         return print("Archivos actualizados con éxito.")
 
-    guardar_button = Button(ventanaPublicar, text="Guardar", command=guardar_texto)
-    guardar_button.grid(row=2, column=1, columnspan=1, pady=10)
+    guardar_button = Button(ventanaPublicar, text="Guardar", command=lambda  : guardar_texto(tituloEntry, postEntry) )
+    guardar_button.grid(row=filaInicial+6, column=1, columnspan=1, pady=5)
     publicar_button = Button(ventanaPublicar, text="Publicar", command=publicar)
-    publicar_button.grid(row=3, column=1, columnspan=1, pady=5)
+    publicar_button.grid(row=filaInicial+7, column=1, columnspan=1, pady=5)
 
 def ventanaGrupo():
     ventanaGrupo = Toplevel(ventana)
@@ -159,8 +180,7 @@ def publicar():
         saludo = "Buen dia"
 
     post = docTXT("Post.txt")
-    link = docTXT("Link.txt")
-    mensaje = (f"{saludo},\n{post}.\n{link}")
+    mensaje = (f"{saludo},\n{post}.\n")
 
     for x in objetivos:
         driver.get(web+x)
@@ -210,8 +230,6 @@ def creacionEntorno():
 
     if not os.path.exists("Publicacion/Post.txt"):
         open("Publicacion/Post.txt", "w").close()
-    if not os.path.exists("Publicacion/Link.txt"):
-        open("Publicacion/Link.txt", "w").close()
 
     return print("entorno creado!")
 
