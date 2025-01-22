@@ -4,6 +4,7 @@ def libSetup(lib):
     # Funcion para instalar automaticamente librerias no existentes
     try:ilib.import_module(lib)
     except ImportError:sub.check_call(['pip', 'install', lib])
+
 import os, time, csv, datetime
 libSetup('tkinter')
 from tkinter import *
@@ -23,51 +24,40 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 def ventanaConfigurar():
     load_dotenv(override=True)
     ventanaConfigurar = Toplevel(ventana)
-    ventanaConfigurar.title("Configuraciones")
+    crearVentana(ventanaConfigurar,"Configuraciones",300,200)
     
-    # Geometria
-    width, heigth = 300, 200
-    puntoMedioAnchura = int((ventanaConfigurar.winfo_screenwidth()-width)/4)
-    puntoMedioAlto = int((ventanaConfigurar.winfo_screenheight()-heigth)/4)
-    ventanaConfigurar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+    userLabel = Label(ventanaConfigurar, text="Usuario: ")
+    userLabel.grid(row=0, column=0, padx=5, pady=5)
+    userDato = Entry(ventanaConfigurar, width=30)
+    userDato.grid(row=0, column=1, padx=5, pady=5)
     
-    user_label = Label(ventanaConfigurar, text="Usuario: ")
-    user_label.grid(row=0, column=0, padx=5, pady=5)
-    user_entry = Entry(ventanaConfigurar, width=30)
-    user_entry.grid(row=0, column=1, padx=5, pady=5)
-    
-    pass_label = Label(ventanaConfigurar, text="Contraseña: ")
-    pass_label.grid(row=1, column=0, padx=5, pady=5)
-    pass_entry = Entry(ventanaConfigurar, width=30)
-    pass_entry.grid(row=1, column=1, padx=5, pady=5)
+    passLabel = Label(ventanaConfigurar, text="Contraseña: ")
+    passLabel.grid(row=1, column=0, padx=5, pady=5)
+    passDato = Entry(ventanaConfigurar, width=30)
+    passDato.grid(row=1, column=1, padx=5, pady=5)
 
     user = codec(os.getenv("FACEBOOK_USERNAME"),False)
-    user_entry.insert(0,user)
+    userDato.insert(0,user)
     pasw = codec(os.getenv("FACEBOOK_PASSWORD"),False)
-    pass_entry.insert(0,pasw)
+    passDato.insert(0,pasw)
 
     def guardar():
-        user = codec(user_entry.get())
-        password = codec(pass_entry.get())
+        user = codec(userDato.get())
+        password = codec(passDato.get())
         if os.path.exists('.env'):
             set_key(".env", "FACEBOOK_USERNAME", user)
             set_key(".env", "FACEBOOK_PASSWORD", password)
         print("Archivos actualizados con éxito.")
-        ventanaConfigurar.destroy()
+        return ventanaConfigurar.destroy()
     
-    guardar_button = Button(ventanaConfigurar, text="Guardar", command=guardar)
-    guardar_button.grid(row=5, column=1, columnspan=2, pady=10)
+    botonGuardar = Button(ventanaConfigurar, text="Guardar", command=guardar)
+    botonGuardar.grid(row=5, column=1, columnspan=2, pady=10)
 
     ventanaConfigurar.mainloop()
 
 def ventanaPublicar():
     ventanaPublicar = Toplevel(ventana)
-    ventanaPublicar.title("Spam de Publicacion")
-
-    width, heigth = 300, 400
-    puntoMedioAnchura = int((ventanaPublicar.winfo_screenwidth()-width)/4)
-    puntoMedioAlto = int((ventanaPublicar.winfo_screenheight()-heigth)/4)
-    ventanaPublicar.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+    crearVentana(ventanaPublicar,"Spam de Publicacion",400,300)
 
     # Recuadro para el post
     post_label = Label(ventanaPublicar, text="Post:")
@@ -162,25 +152,24 @@ def publicar():
     chrome_profile_path = os.path.expandvars(os.getenv("PERFIL_CHROME"))
     options.add_argument("--disable-notifications")
     options.add_argument(f"user-data-dir={chrome_profile_path}")
+
     driver = webdriver.Chrome(options=options)
     AccesoWEB(driver)
-        
-    now = datetime.datetime.now()
-    current_hour = now.hour
-
     web = "https://www.facebook.com/groups/"
     objetivos = docCSV('./Objetivos/Grupos.csv')
 
-    if current_hour > 19 or current_hour < 4:
+    now = datetime.datetime.now()
+    horaActual = now.hour
+    if horaActual > 19 or horaActual < 4:
         saludo = "Buenas noches"
-    elif current_hour > 12:
+    elif horaActual > 12:
         saludo = "Buenas tardes"
     else:
         saludo = "Buen dia"
+
     post = docTXT("Post.txt")
     link = docTXT("LinkImagenInternet.txt")
     mensaje = (f"{saludo},\n{post}.\n{link}")
-    print(mensaje)
 
     for x in objetivos:
         driver.get(web+x)
@@ -197,7 +186,9 @@ def publicar():
             botonPublicar.click()
             print(f"publicacion realizada en: {x}")
         except (NoSuchElementException, TimeoutException) as e:
-            print(e)
+            print(f"No se pudo realizar publicacion. \nError: {e}")
+            continue
+
     print("publicaciones realizadas")
     driver.quit()
         
@@ -207,57 +198,67 @@ def compartir():
     return print("compartido")
 
 def creacionEntorno():
+    def crearCarpeta(nombre):
+        if not os.path.exists(nombre):
+            os.makedirs(nombre)
+
     if not os.path.exists(".env"):
         with open(".env", "w") as env_file:
+            chrome = "%APPDATA%/Google/Chrome"
             env_file.write("FACEBOOK_USERNAME=\n")
             env_file.write("FACEBOOK_PASSWORD=\n")
-            chrome = "%APPDATA%/Google/Chrome"
             env_file.write(f"PERFIL_CHROME={chrome}")
 
-    if not os.path.exists("Objetivos"):
-        os.makedirs("Objetivos")
-    if not os.path.exists("Publicacion"):
-        os.makedirs("Publicacion")
+    crearCarpeta("Objetivos")
+    crearCarpeta("Publicacion")
 
     if not os.path.exists("Objetivos/Grupos.csv"):
         with open("Objetivos/Grupos.csv", "w", newline="") as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow(["Grupo1"])
+            writer.writerow(["ID_grupo,Titulo_del_grupo"])
 
     if not os.path.exists("Publicacion/Post.txt"):
         open("Publicacion/Post.txt", "w").close()
     if not os.path.exists("Publicacion/LinkImagenInternet.txt"):
         open("Publicacion/LinkImagenInternet.txt", "w").close()
-        print("entorno creado!")
-    return 
+
+    return print("entorno creado!")
+
+def crearVentana(ventana,titulo,width,heigth):
+    # Configuración de tamaño y posición de la ventana
+    ventana.title(titulo)
+    puntoMedioAnchura = int((ventana.winfo_screenwidth()-width)/2)
+    puntoMedioAlto = int((ventana.winfo_screenheight()-heigth)/2)
+    ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
 
 def AccesoWEB(driver):
     web = "https://www.facebook.com"
     login = "/login/"
     load_dotenv(override=True)
-    userF = codec(os.getenv("FACEBOOK_USERNAME"),False)
-    passF = codec(os.getenv("FACEBOOK_PASSWORD"),False)
+    dato1 = codec(os.getenv("FACEBOOK_USERNAME"),False)
+    dato2 = codec(os.getenv("FACEBOOK_PASSWORD"),False)
     try:
         driver.get(web+login)
         username_field = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "email")))
-        username_field.send_keys(userF)
+        username_field.send_keys(dato1)
         password_field = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "pass")))
-        password_field.send_keys(passF)
+        password_field.send_keys(dato2)
         login_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "loginbutton")))
         login_button.click()
+        print("Dispones de 50 segundos para hacer la verificacion de 2 pasos de la página.")
         time.sleep(50)
     except:
         print("continuando...")
     return
 
-def codec(w, cifrar=True):
+def codec(w, cif=True):
     x , i = "" , 1
     for c in w:
         y = ord(c)
-        if cifrar : nV = (y+i)%256
+        if cif : nV = (y+i)%256
         else: nV = (y-i)%256
         i += 1
         nV = max(0, min(nV, 0x10FFFF))
@@ -282,14 +283,10 @@ def docTXT(link):
 
 # Inicio de GUI
 ventana = Tk()
-ventana.title("Bot de Facebook")
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# Configuración de tamaño y posición de la ventana
-width, heigth = 400, 300
-puntoMedioAnchura = int((ventana.winfo_screenwidth()-width)/2)
-puntoMedioAlto = int((ventana.winfo_screenheight()-heigth)/2)
-ventana.geometry(f"{width}x{heigth}+{puntoMedioAnchura}+{puntoMedioAlto}")
+crearVentana(ventana,"Bot de Facebook",500,400)
+creacionEntorno()
 load_dotenv()
 
 #Etiquetas
@@ -310,12 +307,9 @@ botonCompartir.grid(row=3, column=3, sticky="news")
 botonCompartir = Button(ventana, text="⚙ Cfg.", command=ventanaConfigurar, background= "lightblue")
 botonCompartir.grid(row=5, column=3, sticky="news")
 
-
 # Expandir columnas hasta el borde (laterales)
 for x in range(0,5):
     ventana.grid_columnconfigure(x, weight=1)
-
-creacionEntorno()
 
 # Bucle
 ventana.mainloop()
