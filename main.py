@@ -8,7 +8,6 @@ def libSetup(lib):
 import os, time, csv, datetime
 libSetup('tkinter')
 from tkinter import *
-import tkinter.ttk as ttk
 libSetup('warnings')
 import warnings
 libSetup('python-dotenv')
